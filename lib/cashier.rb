@@ -1,26 +1,25 @@
 class Cashier
   def initialize(next_handler)
     @next_handler = next_handler
-    @orders = {}
-    @mutex = Mutex.new
+    @orders = Queue.new
   end
 
-  def pay(order_id)
-    @mutex.synchronize do
-      @orders[order_id].paid = true
-    end
-    @next_handler.handle(@orders[order_id])
+  def pay(order)
+    order.paid = true
+    @next_handler.handle(order)
   end
 
-  def outstanding_orders
-    @mutex.synchronize do
-      @orders.select {|number, order| !order.paid }
+  def pay_outstanding_orders
+    counter = 0
+    until @orders.empty?
+      order = @orders.pop()
+      pay(order)
+      counter += 1
     end
+    counter
   end
 
   def handle(order)
-    @mutex.synchronize do
-      @orders[order.number] = order
-    end
+    @orders.push(order)
   end
 end

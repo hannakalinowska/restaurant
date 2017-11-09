@@ -45,8 +45,6 @@ end
 paid_orders = 0
 
 while paid_orders != 100
-  orders = cashier.outstanding_orders
-  orders.each { |number, _order| cashier.pay(number) }
-  paid_orders += orders.count
+  paid_orders += cashier.pay_outstanding_orders
   sleep 0.5
 end
