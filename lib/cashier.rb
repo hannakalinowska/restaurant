@@ -1,6 +1,6 @@
 class Cashier
-  def initialize(next_handler)
-    @next_handler = next_handler
+  def initialize(bus)
+    @bus = bus
     @orders = Queue.new
   end
 
@@ -14,7 +14,7 @@ class Cashier
 
   def pay(order)
     order.paid = true
-    @next_handler.handle(order)
+    @bus.publish('order_paid', order.dup)
   end
 
   def pay_outstanding_orders

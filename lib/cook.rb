@@ -4,8 +4,8 @@ require 'faker'
 class Cook
   attr_reader :name, :cooking_time
 
-  def initialize(next_handler)
-    @next_handler = next_handler
+  def initialize(bus)
+    @bus = bus
     @name = "Cook #{Faker::Name.first_name}"
     @cooking_time = rand
   end
@@ -22,6 +22,6 @@ class Cook
     order.ingredients = ingredients
     order.cooking_time = cooking_time
 
-    @next_handler.handle(order.dup)
+    @bus.publish('order_cooked', order.dup)
   end
 end

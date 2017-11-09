@@ -1,6 +1,13 @@
 require_relative 'order'
 
-class Waiter < ThreadedHandler
+class Waiter
+  attr_reader :name
+
+  def initialize(bus)
+    @bus = bus
+    @name = Faker::Name.first_name
+  end
+
   def place_order(line_items)
     order = Order.new
 
@@ -9,6 +16,6 @@ class Waiter < ThreadedHandler
       order.add_line_item(line_item)
     end
 
-    @queue.push(order)
+    @bus.publish('order_placed', order.dup)
   end
 end

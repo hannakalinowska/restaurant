@@ -3,8 +3,8 @@ require 'faker'
 class AssistantManager
   attr_reader :name
 
-  def initialize(next_handler)
-    @next_handler = next_handler
+  def initialize(bus)
+    @bus = bus
     @name = "Assistant #{Faker::Name.first_name}"
   end
 
@@ -16,6 +16,6 @@ class AssistantManager
 
     # sleep rand
 
-    @next_handler.handle(order.dup)
+    @bus.publish('order_priced', order.dup)
   end
 end

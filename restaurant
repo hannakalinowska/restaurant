@@ -11,26 +11,35 @@ Thread.abort_on_exception = true
 
 Rainbow.enabled = true
 
-cashier = Cashier.new(OrderPrinter.new)
+bus = PubSub.new
+
+printer = OrderPrinter.new
+
+cashier = Cashier.new(bus)
 
 assistant_managers = 2.times.map do
-  assistant_manager = AssistantManager.new(cashier)
+  assistant_manager = AssistantManager.new(bus)
   ThreadedHandler.new(assistant_manager, assistant_manager.name)
 end
 
 assistant_manager_dispatcher = FairyDispatcher.new(assistant_managers)
 
-cooks = 7.times.map do
-  cook = Cook.new(assistant_manager_dispatcher)
+cooks = 3.times.map do
+  cook = Cook.new(bus)
   ThreadedHandler.new(cook, cook.name)
 end
 
-dispatcher = FairyDispatcher.new(cooks)
-waiter = Waiter.new(dispatcher, "Waiter #{Faker::Name.first_name}")
+cook_dispatcher = FairyDispatcher.new(cooks)
+
+waiter = Waiter.new(bus)
+
+bus.subscribe('order_placed', cook_dispatcher)
+bus.subscribe('order_cooked', assistant_manager_dispatcher)
+bus.subscribe('order_priced', cashier)
+bus.subscribe('order_paid', printer)
 
 assistant_managers.each(&:start)
 cooks.each(&:start)
-waiter.start
 
 unless STDERR.tty?
   Thread.new do
@@ -39,7 +48,7 @@ unless STDERR.tty?
       STDERR.puts "\e[H\e[2J"
       STDERR.puts Rainbow('QUEUE SIZES').bright.blue
       STDERR.puts Rainbow('━' * 80).bright.blue
-      ([waiter] + cooks + assistant_managers + [cashier]).each do |handler|
+      (cooks + assistant_managers + [cashier]).each do |handler|
         queue_size = handler.queue_size
         total += queue_size
         STDERR.puts Rainbow("%-20s %5d #{'❚' * queue_size}" % [handler.name, queue_size]).bright.blue
