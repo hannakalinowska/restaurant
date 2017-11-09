@@ -19,6 +19,6 @@ class Cook
     order.ingredients = ingredients
     order.cooking_time = cooking_time
 
-    @next_handler.handle(order)
+    @next_handler.handle(order.dup)
   end
 end

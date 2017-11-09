@@ -9,7 +9,6 @@ class AssistantManager
       order.update_line_item(uuid, 'price' => price)
     end
 
-    @next_handler.handle(order)
+    @next_handler.handle(order.dup)
   end
 end
-
