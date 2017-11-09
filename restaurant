@@ -6,17 +6,27 @@ Dir['./lib/*'].each do |file|
 end
 
 cashier = Cashier.new(OrderPrinter.new)
-assistant_manager = AssistantManager.new(cashier)
-cooks = 3.times.map { Cook.new(assistant_manager) }
+assistant_manager = ThreadedHandler.new(AssistantManager.new(cashier))
+cooks = 3.times.map { ThreadedHandler.new(Cook.new(assistant_manager)) }
 #multiplexer = Multiplexer.new(cooks)
 round_robin_dispatcher = RoundRobinDispatcher.new(cooks)
 waiter = Waiter.new(round_robin_dispatcher)
 
-3.times do
+assistant_manager.start
+cooks.each(&:start)
+
+100.times do
   line_items = (rand(3) + 1).times.map do
     { name: Faker::Food.dish, quantity: rand(10) + 1 }
   end
   waiter.place_order(line_items)
 end
 
-cashier.outstanding_orders.each { |number, _order| cashier.pay(number) }
+paid_orders = 0
+
+while paid_orders != 100
+  orders = cashier.outstanding_orders
+  orders.each { |number, _order| cashier.pay(number) }
+  paid_orders += orders.count
+  sleep 0.5
+end

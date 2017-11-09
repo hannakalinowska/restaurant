@@ -7,7 +7,8 @@ class Cook
   end
 
   def handle(order)
-    cooking_time = 0.5
+    cooking_time = rand
+    puts "#{@name} is cooking #{order.number} for #{(cooking_time * 1000).round}ms"
     sleep(cooking_time)
 
     ingredients = order.line_items.map do |uuid, line_item|
