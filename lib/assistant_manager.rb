@@ -14,7 +14,7 @@ class AssistantManager
       order.update_line_item(uuid, 'price' => price)
     end
 
-    sleep rand
+    sleep 0.1
 
     @bus.publish('order_priced', order.dup)
   end

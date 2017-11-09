@@ -10,7 +10,7 @@ class Cashier
 
   def handle(order)
     order.paid = true
-    sleep rand
+    sleep 0.01
     @bus.publish('order_paid', order.dup)
   end
 end

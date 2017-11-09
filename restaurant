@@ -23,18 +23,14 @@ assistant_managers = 2.times.map do
   ThreadedHandler.wrap(AssistantManager.new(bus))
 end
 
-assistant_manager_dispatcher = FairyDispatcher.new(assistant_managers)
-
 cooks = 3.times.map do
   ThreadedHandler.wrap(Cook.new(bus))
 end
 
-cook_dispatcher = FairyDispatcher.new(cooks)
-
 waiter = Waiter.new(bus)
 
-bus.subscribe('order_placed', cook_dispatcher)
-bus.subscribe('order_cooked', assistant_manager_dispatcher)
+bus.subscribe('order_placed', FairyDispatcher.new(cooks))
+bus.subscribe('order_cooked', FairyDispatcher.new(assistant_managers))
 bus.subscribe('order_priced', cashier)
 bus.subscribe('order_paid', printer)
 

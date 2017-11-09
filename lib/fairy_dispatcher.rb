@@ -5,13 +5,13 @@ class FairyDispatcher
 
   def handle(order)
     loop do
-      @next_handlers.each do |handler|
-        if handler.queue_size < 5
-          handler.handle(order.dup)
-          return
-        end
+      handler = @next_handlers.min_by(&:queue_size)
+      if handler.queue_size < 5
+        handler.handle(order.dup)
+        return
+      else
+        sleep 0.1
       end
-      sleep 0.1
     end
   end
 end
