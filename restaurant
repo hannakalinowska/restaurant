@@ -15,18 +15,16 @@ bus = PubSub.new
 
 printer = OrderPrinter.new
 
-cashier = Cashier.new(bus)
+cashier = ThreadedHandler.wrap(Cashier.new(bus))
 
 assistant_managers = 2.times.map do
-  assistant_manager = AssistantManager.new(bus)
-  ThreadedHandler.new(assistant_manager, assistant_manager.name)
+  ThreadedHandler.wrap(AssistantManager.new(bus))
 end
 
 assistant_manager_dispatcher = FairyDispatcher.new(assistant_managers)
 
 cooks = 3.times.map do
-  cook = Cook.new(bus)
-  ThreadedHandler.new(cook, cook.name)
+  ThreadedHandler.wrap(Cook.new(bus))
 end
 
 cook_dispatcher = FairyDispatcher.new(cooks)
@@ -38,8 +36,7 @@ bus.subscribe('order_cooked', assistant_manager_dispatcher)
 bus.subscribe('order_priced', cashier)
 bus.subscribe('order_paid', printer)
 
-assistant_managers.each(&:start)
-cooks.each(&:start)
+ThreadedHandler.start_all
 
 unless STDERR.tty?
   Thread.new do
@@ -48,7 +45,7 @@ unless STDERR.tty?
       STDERR.puts "\e[H\e[2J"
       STDERR.puts Rainbow('QUEUE SIZES').bright.blue
       STDERR.puts Rainbow('━' * 80).bright.blue
-      (cooks + assistant_managers + [cashier]).each do |handler|
+      ThreadedHandler.registry.each do |handler|
         queue_size = handler.queue_size
         total += queue_size
         STDERR.puts Rainbow("%-20s %5d #{'❚' * queue_size}" % [handler.name, queue_size]).bright.blue
