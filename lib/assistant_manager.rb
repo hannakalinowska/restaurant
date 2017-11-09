@@ -5,7 +5,7 @@ class AssistantManager
 
   def initialize(bus)
     @bus = bus
-    @name = "Assistant #{Faker::Name.first_name}"
+    @name = Faker::Name.first_name
   end
 
   def handle(order)
@@ -14,7 +14,7 @@ class AssistantManager
       order.update_line_item(uuid, 'price' => price)
     end
 
-    # sleep rand
+    sleep rand
 
     @bus.publish('order_priced', order.dup)
   end

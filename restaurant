@@ -1,6 +1,8 @@
 #! /usr/bin/env ruby
 
 require 'bundler/setup'
+
+require 'active_support/inflector'
 require 'rainbow'
 require 'faker'
 Dir['./lib/*'].each do |file|
@@ -48,10 +50,14 @@ unless STDERR.tty?
       ThreadedHandler.registry.each do |handler|
         queue_size = handler.queue_size
         total += queue_size
-        STDERR.puts Rainbow("%-20s %5d #{'❚' * queue_size}" % [handler.name, queue_size]).bright.blue
+        STDERR.puts Rainbow("%-20s %-10s %5d #{'❚' * queue_size}" % [
+          handler.type,
+          handler.name,
+          queue_size
+        ]).bright.blue
       end
       STDERR.puts Rainbow('━' * 80).bright.blue
-      STDERR.puts Rainbow("%-20s %5d #{'❚' * total}" % ['Total', total]).bright.blue
+      STDERR.puts Rainbow("%-31s %5d #{'❚' * total}" % ['Total', total]).bright.blue
       sleep 0.2
     end
   end

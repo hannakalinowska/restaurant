@@ -6,7 +6,7 @@ class Cook
 
   def initialize(bus)
     @bus = bus
-    @name = "Cook #{Faker::Name.first_name}"
+    @name = Faker::Name.first_name
     @cooking_time = rand
   end
 
