@@ -57,21 +57,18 @@ unless STDERR.tty?
   end
 end
 
-thread = Thread.new do
-  paid_orders = 0
-
-  while paid_orders != 100
-    paid_orders += cashier.pay_outstanding_orders
-    # puts "#{paid_orders} paid orders"
-    sleep 0.5
+Signal.trap('SIGINT') do
+  loop do
+    break if printer.order_count == waiter.order_count
+    sleep 0.1
   end
+  exit
 end
 
-100.times do
+loop do
   line_items = (rand(3) + 1).times.map do
     { name: Faker::Food.dish, quantity: rand(10) + 1 }
   end
   waiter.place_order(line_items)
+  sleep 0.2
 end
-
-thread.join

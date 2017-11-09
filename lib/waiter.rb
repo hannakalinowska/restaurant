@@ -1,11 +1,12 @@
 require_relative 'order'
 
 class Waiter
-  attr_reader :name
+  attr_reader :name, :order_count
 
   def initialize(bus)
     @bus = bus
     @name = Faker::Name.first_name
+    @order_count = 0
   end
 
   def place_order(line_items)
@@ -17,5 +18,7 @@ class Waiter
     end
 
     @bus.publish('order_placed', order.dup)
+
+    @order_count += 1
   end
 end
