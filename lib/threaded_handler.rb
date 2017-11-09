@@ -1,7 +1,14 @@
 class ThreadedHandler
-  def initialize(next_handler)
+  attr_reader :name
+  
+  def initialize(next_handler, name)
+    @name = name
     @queue = Queue.new
     @next_handler = next_handler
+  end
+
+  def queue_size
+    @queue.size
   end
 
   def handle(order)

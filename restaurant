@@ -1,19 +1,39 @@
 #! /usr/bin/env ruby
 
+require 'bundler/setup'
+require 'rainbow'
 require 'faker'
 Dir['./lib/*'].each do |file|
   require File.expand_path(file, __dir__)
 end
 
+Thread.abort_on_exception = true
+
 cashier = Cashier.new(OrderPrinter.new)
-assistant_manager = ThreadedHandler.new(AssistantManager.new(cashier))
-cooks = 3.times.map { ThreadedHandler.new(Cook.new(assistant_manager)) }
+assistant_manager = ThreadedHandler.new(AssistantManager.new(cashier), 'Assistant manager')
+cooks = 3.times.map do
+  cook = Cook.new(assistant_manager)
+  ThreadedHandler.new(cook, cook.name)
+end
 #multiplexer = Multiplexer.new(cooks)
 round_robin_dispatcher = RoundRobinDispatcher.new(cooks)
 waiter = Waiter.new(round_robin_dispatcher)
 
 assistant_manager.start
 cooks.each(&:start)
+
+Thread.new do
+  loop do
+    puts Rainbow([
+      '=' * 80,
+      "QUEUES: " + ((cooks + [assistant_manager]).map do |handler|
+        "#{handler.name}: #{handler.queue_size}"
+      end.join(' / ')),
+      '=' * 80
+    ].join("\n")).bright.blue
+    sleep 1
+  end
+end
 
 100.times do
   line_items = (rand(3) + 1).times.map do

@@ -1,6 +1,9 @@
+require 'rainbow'
 require 'faker'
 
 class Cook
+  attr_reader :name
+
   def initialize(next_handler)
     @next_handler = next_handler
     @name = Faker::Name.first_name
@@ -8,7 +11,7 @@ class Cook
 
   def handle(order)
     cooking_time = rand
-    puts "#{@name} is cooking #{order.number} for #{(cooking_time * 1000).round}ms"
+    puts Rainbow("#{@name} is cooking #{order.number} for #{(cooking_time * 1000).round}ms").bright.orange
     sleep(cooking_time)
 
     ingredients = order.line_items.map do |uuid, line_item|

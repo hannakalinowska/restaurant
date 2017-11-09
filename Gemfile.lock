@@ -16,6 +16,9 @@ GEM
     pry-byebug (3.5.0)
       byebug (~> 9.1)
       pry (~> 0.10)
+    rainbow (2.2.2)
+      rake
+    rake (12.1.0)
     rspec (3.7.0)
       rspec-core (~> 3.7.0)
       rspec-expectations (~> 3.7.0)
@@ -36,7 +39,8 @@ PLATFORMS
 DEPENDENCIES
   faker
   pry-byebug
+  rainbow
   rspec
 
 BUNDLED WITH
-   1.15.1
+   1.15.4
