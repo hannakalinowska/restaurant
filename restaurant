@@ -1,25 +1,20 @@
 #! /usr/bin/env ruby
 
+require 'faker'
 Dir['./lib/*'].each do |file|
   require File.expand_path(file, __dir__)
 end
 
 cashier = Cashier.new(OrderPrinter.new)
-waiter = Waiter.new(Cook.new(AssistantManager.new(cashier)))
+assistant_manager = AssistantManager.new(cashier)
+cooks = 3.times.map { Cook.new(assistant_manager) }
+#multiplexer = Multiplexer.new(cooks)
+round_robin_dispatcher = RoundRobinDispatcher.new(cooks)
+waiter = Waiter.new(round_robin_dispatcher)
 
-LINE_ITEMS = [
-  'Pizza',
-  'Coffee',
-  'Chocolate',
-  'Ice cream',
-  'Ketchup',
-  'Chips',
-  'Crisps'
-]
-
-(99 + 1).times do
+3.times do
   line_items = (rand(3) + 1).times.map do
-    { name: LINE_ITEMS.sample, quantity: rand(10) + 1 }
+    { name: Faker::Food.dish, quantity: rand(10) + 1 }
   end
   waiter.place_order(line_items)
 end

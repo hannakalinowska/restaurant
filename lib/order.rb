@@ -22,7 +22,7 @@ class Order
   end
 
   def to_json
-    @data.to_json
+    @data.merge(object_id: object_id).to_json
   end
 
   def method_missing(m, *args, &block)
