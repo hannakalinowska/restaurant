@@ -9,6 +9,8 @@ end
 
 Thread.abort_on_exception = true
 
+Rainbow.enabled = true
+
 cashier = Cashier.new(OrderPrinter.new)
 assistant_manager = ThreadedHandler.new(AssistantManager.new(cashier), 'Assistant manager')
 cooks = 3.times.map do
@@ -22,16 +24,18 @@ waiter = Waiter.new(round_robin_dispatcher)
 assistant_manager.start
 cooks.each(&:start)
 
-Thread.new do
-  loop do
-    puts Rainbow([
-      '=' * 80,
-      "QUEUES: " + ((cooks + [assistant_manager]).map do |handler|
-        "#{handler.name}: #{handler.queue_size}"
-      end.join(' / ')),
-      '=' * 80
-    ].join("\n")).bright.blue
-    sleep 1
+unless STDERR.tty?
+  Thread.new do
+    loop do
+      STDERR.puts "\e[H\e[2J"
+      STDERR.puts Rainbow('QUEUE SIZES').bright.blue
+      STDERR.puts Rainbow('━' * 80).bright.blue
+      (cooks + [assistant_manager]).each do |handler|
+        STDERR.puts Rainbow("%-20s %5d #{'❚' * handler.queue_size}" % [handler.name, handler.queue_size]).bright.blue
+      end
+      STDERR.puts Rainbow('━' * 80).bright.blue
+      sleep 0.1
+    end
   end
 end
 

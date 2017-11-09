@@ -2,15 +2,15 @@ require 'rainbow'
 require 'faker'
 
 class Cook
-  attr_reader :name
+  attr_reader :name, :cooking_time
 
   def initialize(next_handler)
     @next_handler = next_handler
     @name = Faker::Name.first_name
+    @cooking_time = rand
   end
 
   def handle(order)
-    cooking_time = rand
     puts Rainbow("#{@name} is cooking #{order.number} for #{(cooking_time * 1000).round}ms").bright.orange
     sleep(cooking_time)
 
