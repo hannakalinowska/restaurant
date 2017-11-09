@@ -4,6 +4,14 @@ class Cashier
     @orders = Queue.new
   end
 
+  def name
+    'Cashier'
+  end
+
+  def queue_size
+    @orders.size
+  end
+
   def pay(order)
     order.paid = true
     @next_handler.handle(order)

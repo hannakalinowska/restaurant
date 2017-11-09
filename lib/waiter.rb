@@ -1,11 +1,6 @@
 require_relative 'order'
 
-class Waiter
-  def initialize(handle_order)
-    @handle_order = handle_order
-    @name = Faker::Name.first_name
-  end
-
+class Waiter < ThreadedHandler
   def place_order(line_items)
     order = Order.new
 
@@ -14,6 +9,6 @@ class Waiter
       order.add_line_item(line_item)
     end
 
-    @handle_order.handle(order)
+    @queue.push(order)
   end
 end

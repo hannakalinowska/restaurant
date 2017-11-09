@@ -1,6 +1,11 @@
+require 'faker'
+
 class AssistantManager
+  attr_reader :name
+
   def initialize(next_handler)
     @next_handler = next_handler
+    @name = "Assistant #{Faker::Name.first_name}"
   end
 
   def handle(order)
@@ -9,7 +14,7 @@ class AssistantManager
       order.update_line_item(uuid, 'price' => price)
     end
 
-    sleep 0.1
+    # sleep rand
 
     @next_handler.handle(order.dup)
   end

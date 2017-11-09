@@ -6,7 +6,7 @@ class Cook
 
   def initialize(next_handler)
     @next_handler = next_handler
-    @name = Faker::Name.first_name
+    @name = "Cook #{Faker::Name.first_name}"
     @cooking_time = rand
   end
 

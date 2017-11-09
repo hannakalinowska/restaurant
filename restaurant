@@ -12,30 +12,52 @@ Thread.abort_on_exception = true
 Rainbow.enabled = true
 
 cashier = Cashier.new(OrderPrinter.new)
-assistant_manager = ThreadedHandler.new(AssistantManager.new(cashier), 'Assistant manager')
-cooks = 3.times.map do
-  cook = Cook.new(assistant_manager)
+
+assistant_managers = 2.times.map do
+  assistant_manager = AssistantManager.new(cashier)
+  ThreadedHandler.new(assistant_manager, assistant_manager.name)
+end
+
+assistant_manager_dispatcher = FairyDispatcher.new(assistant_managers)
+
+cooks = 7.times.map do
+  cook = Cook.new(assistant_manager_dispatcher)
   ThreadedHandler.new(cook, cook.name)
 end
-#multiplexer = Multiplexer.new(cooks)
-round_robin_dispatcher = RoundRobinDispatcher.new(cooks)
-waiter = Waiter.new(round_robin_dispatcher)
 
-assistant_manager.start
+dispatcher = FairyDispatcher.new(cooks)
+waiter = Waiter.new(dispatcher, "Waiter #{Faker::Name.first_name}")
+
+assistant_managers.each(&:start)
 cooks.each(&:start)
+waiter.start
 
 unless STDERR.tty?
   Thread.new do
     loop do
+      total = 0
       STDERR.puts "\e[H\e[2J"
       STDERR.puts Rainbow('QUEUE SIZES').bright.blue
       STDERR.puts Rainbow('━' * 80).bright.blue
-      (cooks + [assistant_manager]).each do |handler|
-        STDERR.puts Rainbow("%-20s %5d #{'❚' * handler.queue_size}" % [handler.name, handler.queue_size]).bright.blue
+      ([waiter] + cooks + assistant_managers + [cashier]).each do |handler|
+        queue_size = handler.queue_size
+        total += queue_size
+        STDERR.puts Rainbow("%-20s %5d #{'❚' * queue_size}" % [handler.name, queue_size]).bright.blue
       end
       STDERR.puts Rainbow('━' * 80).bright.blue
-      sleep 0.1
+      STDERR.puts Rainbow("%-20s %5d #{'❚' * total}" % ['Total', total]).bright.blue
+      sleep 0.2
     end
+  end
+end
+
+thread = Thread.new do
+  paid_orders = 0
+
+  while paid_orders != 100
+    paid_orders += cashier.pay_outstanding_orders
+    # puts "#{paid_orders} paid orders"
+    sleep 0.5
   end
 end
 
@@ -46,9 +68,4 @@ end
   waiter.place_order(line_items)
 end
 
-paid_orders = 0
-
-while paid_orders != 100
-  paid_orders += cashier.pay_outstanding_orders
-  sleep 0.5
-end
+thread.join
