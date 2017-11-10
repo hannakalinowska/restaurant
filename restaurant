@@ -57,12 +57,11 @@ unless STDERR.tty?
   end
 end
 
+waiting_for_closing = false
+
 Signal.trap('SIGINT') do
-  loop do
-    break if printer.order_count == waiter.order_count
-    sleep 0.1
-  end
-  exit
+  exit if waiting_for_closing
+  waiting_for_closing = true
 end
 
 loop do
@@ -70,5 +69,10 @@ loop do
     { name: Faker::Food.dish, quantity: rand(10) + 1 }
   end
   waiter.place_order(line_items)
+  break if waiting_for_closing
+  sleep 0.2
+end
+
+until printer.order_count == waiter.order_count
   sleep 0.2
 end
