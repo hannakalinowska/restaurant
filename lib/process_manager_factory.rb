@@ -2,11 +2,21 @@ class ProcessManagerFactory
   def initialize(bus)
     @process_managers = {}
     @bus = bus
+    @bus.subscribe('order_placed', 'order_paid', self)
+  end
+
+  def count
+    @process_managers.count
   end
 
   def handle(message)
     correlation_id = message.correlation_id
-    @process_managers[correlation_id] = ProcessManager.new(@bus, correlation_id)
+    case message.type
+    when 'order_placed'
+      @process_managers[correlation_id] = ProcessManager.new(@bus, correlation_id)
+    when 'order_paid'
+      @process_managers.delete(correlation_id)
+    end
   end
 end
 
@@ -25,6 +35,8 @@ class ProcessManager
       @bus.publish(message.reply('price_order'))
     when 'order_priced'
       @bus.publish(message.reply('take_payment'))
+    when 'order_paid'
+      @bus.unsubscribe(self)
     end
   end
 end

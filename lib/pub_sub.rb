@@ -1,6 +1,6 @@
 class PubSub
   def initialize
-    @topics = {}
+    @topics = Hash.new { |h, k| h[k] = [] }
     @mutex = Mutex.new
     @log = File.open(Bundler.root.join('history.log'), 'a+')
   end
@@ -20,12 +20,19 @@ class PubSub
     subscribe(correlation_id, handler)
   end
 
-  def subscribe(topic, handler)
+  def subscribe(*subscribed_topics, handler)
     @mutex.synchronize do
       topics = @topics.dup
-      topics[topic] ||= []
-      topics[topic].push(handler)
+      subscribed_topics.each { |t| topics[t].push(handler) }
       @topics = topics
+    end
+  end
+
+  def unsubscribe(handler)
+    @mutex.synchronize do
+      @topics.each do |topic, handlers|
+        handlers.delete(handler)
+      end
     end
   end
 end

@@ -32,7 +32,7 @@ bus.subscribe('price_order', FairyDispatcher.new(assistant_managers))
 bus.subscribe('take_payment', cashier)
 bus.subscribe('order_paid', printer)
 
-bus.subscribe('order_placed', ProcessManagerFactory.new(bus))
+process_manager_factory = ProcessManagerFactory.new(bus)
 
 ThreadedHandler.start_all
 
@@ -54,6 +54,12 @@ unless STDERR.tty?
       end
       STDERR.puts Rainbow('━' * 80).bright.blue
       STDERR.puts Rainbow("%-31s %5d #{'❚' * total}" % ['Total', total]).bright.blue
+      STDERR.puts Rainbow('━' * 80).bright.blue
+      STDERR.puts Rainbow("%-31s %5d #{'❚' * process_manager_factory.count}" % [
+        'PROCESS MANAGERS',
+        process_manager_factory.count
+      ]).bright.blue
+      STDERR.puts Rainbow('━' * 80).bright.blue
       sleep 0.2
     end
   end
