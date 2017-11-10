@@ -21,8 +21,8 @@ class Order
     @data['line_items'][uuid].merge!(attrs)
   end
 
-  def to_json
-    @data.merge(object_id: object_id).to_json
+  def to_json(*a)
+    @data.to_json
   end
 
   def method_missing(m, *args, &block)

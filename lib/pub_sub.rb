@@ -10,9 +10,8 @@ class PubSub
   end
 
   def publish(message)
-    topic = message.type
-    @log.syswrite(message.order.to_json + $RS)
-    @topics.fetch(topic, []).each { |handler| handler.handle(message) }
+    @log.syswrite(message.to_json + $RS)
+    @topics.fetch(message.type, []).each { |handler| handler.handle(message) }
     @topics.fetch(message.correlation_id, []).each { |handler| handler.handle(message) }
   end
 

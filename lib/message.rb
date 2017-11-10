@@ -17,4 +17,14 @@ class Message
       message.correlation_id = self.correlation_id
     end
   end
+
+  def to_json(*a)
+    {
+      id: message_id,
+      causation_id: causation_id,
+      correlation_id: correlation_id,
+      type: type,
+      payload: @order
+    }.to_json
+  end
 end
