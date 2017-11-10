@@ -1,4 +1,12 @@
 class ChaosMonkey
+  def self.record(type)
+    report[type] += 1
+  end
+
+  def self.report
+    @report ||= Hash.new(0)
+  end
+
   def initialize(next_handler)
     @next_handler = next_handler
   end
@@ -8,9 +16,9 @@ class ChaosMonkey
 
     case chaos
     when 0 .. 10
-      puts Rainbow("MESSAGE DROPPED MWAHAHAHA").bright.red
+      self.class.record(:dropped)
     when 85 .. 100
-      puts Rainbow("BANANANANANA #{message.correlation_id}").bright.red
+      self.class.record(:duplicates)
       @next_handler.handle(message)
       @next_handler.handle(message)
     else

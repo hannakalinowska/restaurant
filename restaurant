@@ -71,6 +71,14 @@ print_monitor = Proc.new do
     end
     STDERR.puts Rainbow('━' * 80).bright.pink
   end
+  STDERR.puts Rainbow('CHAOS').bright.red
+  STDERR.puts Rainbow('━' * 80).bright.red
+  ChaosMonkey.report.each do |type, count|
+    STDERR.puts Rainbow("%-31s %5d #{'🍌' * count}" % [
+      type.to_s.humanize,
+      count
+    ]).bright.red
+  end
 end
 
 unless STDERR.tty?
