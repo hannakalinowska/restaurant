@@ -44,14 +44,14 @@ print_monitor = Proc.new do
   ThreadedHandler.registry.each do |handler|
     queue_size = handler.queue_size
     total += queue_size
-    STDERR.puts Rainbow("%-20s %-10s %5d #{'❚' * queue_size}" % [
+    STDERR.puts Rainbow("%-20s %-10s %5d #{'🦋' * queue_size}" % [
       handler.type,
       handler.name,
       queue_size
     ]).bright.blue
   end
   STDERR.puts Rainbow('━' * 80).bright.blue
-  STDERR.puts Rainbow("%-31s %5d #{'❚' * total}" % ['Total', total]).bright.blue
+  STDERR.puts Rainbow("%-31s %5d #{'🦋' * total}" % ['Total', total]).bright.blue
   STDERR.puts Rainbow('━' * 80).bright.blue
   if process_manager_factory.any?
     STDERR.puts Rainbow('PROCESS MANAGERS').bright.pink
