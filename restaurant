@@ -9,6 +9,9 @@ end
 
 Thread.abort_on_exception = true
 
+$cooked_orders = []
+$mutex = Mutex.new
+
 Rainbow.enabled = true
 
 bus = PubSub.new

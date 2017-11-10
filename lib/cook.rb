@@ -13,6 +13,11 @@ class Cook
   def handle(message)
     order = message.payload
 
+    $mutex.synchronize do
+      return if $cooked_orders.include?(order.number)
+      $cooked_orders << order.number
+    end
+
     puts Rainbow("#{@name} is cooking #{order.number} for #{(cooking_time * 1000).round}ms").bright.orange
     sleep(cooking_time)
 
