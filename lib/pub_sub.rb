@@ -2,11 +2,16 @@ class PubSub
   def initialize
     @topics = {}
     @mutex = Mutex.new
+    @log = File.open(Bundler.root.join('history.log'), 'a+')
+  end
+
+  def close
+    @log.close
   end
 
   def publish(message)
     topic = message.type
-
+    @log.syswrite(message.order.to_json + $RS)
     @topics.fetch(topic, []).each { |handler| handler.handle(message) }
     @topics.fetch(message.correlation_id, []).each { |handler| handler.handle(message) }
   end

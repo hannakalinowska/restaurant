@@ -62,7 +62,10 @@ end
 waiting_for_closing = false
 
 Signal.trap('SIGINT') do
-  exit if waiting_for_closing
+  if waiting_for_closing
+    bus.close
+    exit
+  end
   waiting_for_closing = true
 end
 
@@ -78,3 +81,5 @@ end
 until printer.order_count == waiter.order_count
   sleep 0.2
 end
+
+bus.close
