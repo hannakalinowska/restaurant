@@ -27,7 +27,7 @@ end
 
 waiter = Waiter.new(bus)
 
-bus.subscribe('cook_food', FairyDispatcher.new(cooks))
+bus.subscribe('cook_food', ChaosMonkey.new(FairyDispatcher.new(cooks)))
 bus.subscribe('price_order', FairyDispatcher.new(assistant_managers))
 bus.subscribe('take_payment', cashier)
 bus.subscribe('order_paid', printer)
