@@ -8,7 +8,7 @@ class OrderPrinter
   end
 
   def handle(message)
-    puts Rainbow("Order #{message.order.number} paid").bright.green
+    puts Rainbow("Order #{message.payload.number} paid").bright.green
     @order_count += 1
   end
 end

@@ -9,7 +9,7 @@ class Cashier
   end
 
   def handle(message)
-    order = message.order
+    order = message.payload
 
     order.paid = true
     sleep 0.01

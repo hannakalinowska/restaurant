@@ -9,7 +9,7 @@ class AssistantManager
   end
 
   def handle(message)
-    order = message.order
+    order = message.payload
 
     order.line_items.each do |uuid, line_item|
       price = rand(30)

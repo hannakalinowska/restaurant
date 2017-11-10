@@ -11,7 +11,7 @@ class Cook
   end
 
   def handle(message)
-    order = message.order
+    order = message.payload
 
     puts Rainbow("#{@name} is cooking #{order.number} for #{(cooking_time * 1000).round}ms").bright.orange
     sleep(cooking_time)

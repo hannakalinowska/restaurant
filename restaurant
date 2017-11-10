@@ -27,13 +27,17 @@ end
 
 waiter = Waiter.new(bus)
 
+alarm_clock = AlarmClock.new(bus)
+
 bus.subscribe('cook_food', ChaosMonkey.new(FairyDispatcher.new(cooks)))
 bus.subscribe('price_order', FairyDispatcher.new(assistant_managers))
 bus.subscribe('take_payment', cashier)
 bus.subscribe('order_paid', printer)
+bus.subscribe('schedule_message', alarm_clock)
 
 process_manager_factory = ProcessManagerFactory.new(bus)
 
+alarm_clock.start
 ThreadedHandler.start_all
 
 print_monitor = Proc.new do

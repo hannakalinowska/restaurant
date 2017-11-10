@@ -9,6 +9,10 @@ class PubSub
     @log.close
   end
 
+  def schedule(message, seconds)
+    @messages << message
+  end
+
   def publish(message)
     @log.syswrite(message.to_json + $RS)
     @topics.fetch(message.type, []).each { |handler| handler.handle(message) }
