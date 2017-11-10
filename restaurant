@@ -54,15 +54,15 @@ print_monitor = Proc.new do
   STDERR.puts Rainbow("%-31s %5d #{'❚' * total}" % ['Total', total]).bright.blue
   STDERR.puts Rainbow('━' * 80).bright.blue
   if process_manager_factory.any?
-    STDERR.puts Rainbow('PROCESS MANAGERS').bright.blue
-    STDERR.puts Rainbow('━' * 80).bright.blue
+    STDERR.puts Rainbow('PROCESS MANAGERS').bright.pink
+    STDERR.puts Rainbow('━' * 80).bright.pink
     process_manager_factory.count_by_type.each do |type, count|
-      STDERR.puts Rainbow("%-31s %5d #{'❚' * count}" % [
+      STDERR.puts Rainbow("%-31s %5d #{'🌸' * count}" % [
         type,
         count
-      ]).bright.blue
+      ]).bright.pink
     end
-    STDERR.puts Rainbow('━' * 80).bright.blue
+    STDERR.puts Rainbow('━' * 80).bright.pink
   end
 end
 
