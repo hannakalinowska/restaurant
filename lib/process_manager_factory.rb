@@ -18,6 +18,13 @@ class ProcessManager
   end
 
   def handle(message)
-    puts "Got your order! #{message.type}"
+    case message.type
+    when 'order_placed'
+      @bus.publish(message.reply('cook_food'))
+    when 'order_cooked'
+      @bus.publish(message.reply('price_order'))
+    when 'order_priced'
+      @bus.publish(message.reply('take_payment'))
+    end
   end
 end

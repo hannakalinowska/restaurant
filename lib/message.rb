@@ -10,8 +10,8 @@ class Message
     @order = order.dup
   end
 
-  def reply(type, order)
-    Message.new(order).tap do |message|
+  def reply(type, order = nil)
+    Message.new(type, order || @order).tap do |message|
       message.type = type
       message.causation_id = self.message_id
       message.correlation_id = self.correlation_id
