@@ -10,7 +10,9 @@ class Cook
     @cooking_time = rand + 0.5
   end
 
-  def handle(order)
+  def handle(message)
+    order = message.order
+
     puts Rainbow("#{@name} is cooking #{order.number} for #{(cooking_time * 1000).round}ms").bright.orange
     sleep(cooking_time)
 
@@ -22,6 +24,6 @@ class Cook
     order.ingredients = ingredients
     order.cooking_time = cooking_time
 
-    @bus.publish('order_cooked', order.dup)
+    @bus.publish(message.reply('order_cooked', order))
   end
 end

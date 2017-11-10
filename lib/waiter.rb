@@ -17,7 +17,10 @@ class Waiter
       order.add_line_item(line_item)
     end
 
-    @bus.publish('order_placed', order.dup)
+    message = Message.new('order_placed', order).tap do |m|
+      m.correlation_id = order.number
+    end
+    @bus.publish(message)
 
     @order_count += 1
   end

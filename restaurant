@@ -27,10 +27,12 @@ end
 
 waiter = Waiter.new(bus)
 
-bus.subscribe('order_placed', FairyDispatcher.new(cooks))
-bus.subscribe('order_cooked', FairyDispatcher.new(assistant_managers))
-bus.subscribe('order_priced', cashier)
+bus.subscribe('cook_food', FairyDispatcher.new(cooks))
+bus.subscribe('price_order', FairyDispatcher.new(assistant_managers))
+bus.subscribe('take_payment', cashier)
 bus.subscribe('order_paid', printer)
+
+bus.subscribe('order_placed', ProcessManagerFactory.new(bus))
 
 ThreadedHandler.start_all
 

@@ -8,7 +8,9 @@ class AssistantManager
     @name = Faker::Name.first_name
   end
 
-  def handle(order)
+  def handle(message)
+    order = message.order
+
     order.line_items.each do |uuid, line_item|
       price = rand(30)
       order.update_line_item(uuid, 'price' => price)
@@ -16,6 +18,6 @@ class AssistantManager
 
     sleep 0.1
 
-    @bus.publish('order_priced', order.dup)
+    @bus.publish(message.reply('order_priced', order))
   end
 end

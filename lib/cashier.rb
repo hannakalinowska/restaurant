@@ -8,9 +8,11 @@ class Cashier
     @name = Faker::Name.first_name
   end
 
-  def handle(order)
+  def handle(message)
+    order = message.order
+
     order.paid = true
     sleep 0.01
-    @bus.publish('order_paid', order.dup)
+    @bus.publish(message.reply('order_paid', order))
   end
 end
