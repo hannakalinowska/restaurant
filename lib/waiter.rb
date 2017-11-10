@@ -12,6 +12,8 @@ class Waiter
   def place_order(line_items)
     order = Order.new
 
+    order.dodgy = (@order_count % 3) > 0
+
     order.waiter = @name
     line_items.each do |line_item|
       order.add_line_item(line_item)

@@ -36,30 +36,40 @@ process_manager_factory = ProcessManagerFactory.new(bus)
 
 ThreadedHandler.start_all
 
+print_monitor = Proc.new do
+  total = 0
+  STDERR.puts "\e[H\e[2J"
+  STDERR.puts Rainbow('QUEUE SIZES').bright.blue
+  STDERR.puts Rainbow('━' * 80).bright.blue
+  ThreadedHandler.registry.each do |handler|
+    queue_size = handler.queue_size
+    total += queue_size
+    STDERR.puts Rainbow("%-20s %-10s %5d #{'❚' * queue_size}" % [
+      handler.type,
+      handler.name,
+      queue_size
+    ]).bright.blue
+  end
+  STDERR.puts Rainbow('━' * 80).bright.blue
+  STDERR.puts Rainbow("%-31s %5d #{'❚' * total}" % ['Total', total]).bright.blue
+  STDERR.puts Rainbow('━' * 80).bright.blue
+  if process_manager_factory.any?
+    STDERR.puts Rainbow('PROCESS MANAGERS').bright.blue
+    STDERR.puts Rainbow('━' * 80).bright.blue
+    process_manager_factory.count_by_type.each do |type, count|
+      STDERR.puts Rainbow("%-31s %5d #{'❚' * count}" % [
+        type,
+        count
+      ]).bright.blue
+    end
+    STDERR.puts Rainbow('━' * 80).bright.blue
+  end
+end
+
 unless STDERR.tty?
   Thread.new do
     loop do
-      total = 0
-      STDERR.puts "\e[H\e[2J"
-      STDERR.puts Rainbow('QUEUE SIZES').bright.blue
-      STDERR.puts Rainbow('━' * 80).bright.blue
-      ThreadedHandler.registry.each do |handler|
-        queue_size = handler.queue_size
-        total += queue_size
-        STDERR.puts Rainbow("%-20s %-10s %5d #{'❚' * queue_size}" % [
-          handler.type,
-          handler.name,
-          queue_size
-        ]).bright.blue
-      end
-      STDERR.puts Rainbow('━' * 80).bright.blue
-      STDERR.puts Rainbow("%-31s %5d #{'❚' * total}" % ['Total', total]).bright.blue
-      STDERR.puts Rainbow('━' * 80).bright.blue
-      STDERR.puts Rainbow("%-31s %5d #{'❚' * process_manager_factory.count}" % [
-        'PROCESS MANAGERS',
-        process_manager_factory.count
-      ]).bright.blue
-      STDERR.puts Rainbow('━' * 80).bright.blue
+      print_monitor.call
       sleep 0.2
     end
   end
@@ -84,8 +94,10 @@ loop do
   sleep 0.2
 end
 
-until printer.order_count == waiter.order_count
+while process_manager_factory.any?
   sleep 0.2
 end
+
+print_monitor.call
 
 bus.close
